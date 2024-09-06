@@ -4,28 +4,30 @@ import math
 
 def getLength(path, dimensions):
     """
-        Find length of a path as distance between nodes in it
+    Find length of a path as distance between nodes in it
 
-        Parameters
-        ----------
-        path : list
-            list of nodes in the path
+    Parameters
+    ----------
+    path : list
+        list of nodes in the path
 
-        dimensions : list
-            list with pixel dimensions in desired unit (e.g. microns)
-            3D: [z, y, x]   2D: [y, x]
+    dimensions : list
+        list with pixel dimensions in desired unit (e.g. microns)
+        3D: [z, y, x]   2D: [y, x]
 
-        Returns
-        -------
-        length : float
-            Length of path
+    Returns
+    -------
+    length : float
+        Length of path
     """
     length = 0
     for index, item in enumerate(path):
         if index + 1 != len(path):
             item2 = path[index + 1]
         vect = [j - i for i, j in zip(item, item2)]
-        vect = [a * b for a, b in zip(vect, dimensions)]  # multiply pixel length with original length
+        vect = [
+            a * b for a, b in zip(vect, dimensions)
+        ]  # multiply pixel length with original length
         length += np.linalg.norm(vect)
     return length
 
@@ -45,18 +47,21 @@ def getRadius(distTrans, segment, smallRAMmode=0):
 
 
 def getVolumeCylinder(radius, segLength):
-    return math.pi * radius ** 2 * segLength
+    return math.pi * radius**2 * segLength
 
 
 def getVolume(skelRadii, segment, dimensions):
     volume = 0
     for index, skelPt in enumerate(segment):
         if index + 1 != len(segment):
-            vect = [j - i for i, j in zip(skelPt, segment[index+1])]
-            vect = [a * b for a, b in zip(vect, dimensions)]  # multiply with pixel dimensions
+            vect = [j - i for i, j in zip(skelPt, segment[index + 1])]
+            vect = [
+                a * b for a, b in zip(vect, dimensions)
+            ]  # multiply with pixel dimensions
             rad = skelRadii[int(skelPt[0]), int(skelPt[1]), int(skelPt[2])]
-            volume += math.pi * rad ** 2 * np.linalg.norm(vect)
+            volume += math.pi * rad**2 * np.linalg.norm(vect)
     return volume
+
 
 # def getVolume(skelRadii, segment, segLength, dimensions, fast=True):
 #     """
@@ -100,11 +105,14 @@ def getVolume(skelRadii, segment, dimensions):
 #
 #     return volume, diameter
 
+
 def get_z_angle(segment, pixelDims):
     zVector = [1, 0, 0]
     v1 = segment[0]
 
-    if segment[len(segment) - 1] == segment[0]:  # in case of a circle, take pre-last point
+    if (
+        segment[len(segment) - 1] == segment[0]
+    ):  # in case of a circle, take pre-last point
         v2 = segment[len(segment) - 2]
     else:
         v2 = segment[len(segment) - 1]
@@ -119,9 +127,9 @@ def get_z_angle(segment, pixelDims):
 
     segVector = [a * b for a, b in zip(segVector, pixelDims)]
 
-    cosine_angle = np.dot(zVector, segVector) / (np.linalg.norm(zVector) * np.linalg.norm(segVector))
+    cosine_angle = np.dot(zVector, segVector) / (
+        np.linalg.norm(zVector) * np.linalg.norm(segVector)
+    )
     angle = np.arccos(round(cosine_angle, 4))
 
     return round(np.degrees(angle), 4)
-
-

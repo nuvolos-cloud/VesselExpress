@@ -1,4 +1,5 @@
 import itertools
+
 # import time
 
 import numpy as np
@@ -64,8 +65,13 @@ def _get_increments(config_number, dimensions):
         list_step_directions = LIST_STEP_DIRECTIONS3D
     elif dimensions == 2:
         list_step_directions = LIST_STEP_DIRECTIONS2D
-    neighbor_values = [(config_number >> digit) & 0x01 for digit in range(3 ** dimensions - 1)]
-    return [neighbor_value * increment for neighbor_value, increment in zip(neighbor_values, list_step_directions)]
+    neighbor_values = [
+        (config_number >> digit) & 0x01 for digit in range(3**dimensions - 1)
+    ]
+    return [
+        neighbor_value * increment
+        for neighbor_value, increment in zip(neighbor_values, list_step_directions)
+    ]
 
 
 def _set_adjacency_list(arr):
@@ -86,19 +92,30 @@ def _set_adjacency_list(arr):
 
     """
     dimensions = arr.ndim
-    assert dimensions in [2, 3], "array dimensions must be 2 or 3, they are {}".format(dimensions)
+    assert dimensions in [2, 3], "array dimensions must be 2 or 3, they are {}".format(
+        dimensions
+    )
     if dimensions == 3:
         # flipped 3D template in advance
-        template = np.array([[[33554432, 16777216, 8388608], [4194304, 2097152, 1048576], [524288, 262144, 131072]],
-                            [[65536, 32768, 16384], [8192, 0, 4096], [2048, 1024, 512]],
-                            [[256, 128, 64], [32, 16, 8], [4, 2, 1]]], dtype=np.uint64)
+        template = np.array(
+            [
+                [
+                    [33554432, 16777216, 8388608],
+                    [4194304, 2097152, 1048576],
+                    [524288, 262144, 131072],
+                ],
+                [[65536, 32768, 16384], [8192, 0, 4096], [2048, 1024, 512]],
+                [[256, 128, 64], [32, 16, 8], [4, 2, 1]],
+            ],
+            dtype=np.uint64,
+        )
     else:
         # 2 dimensions
         template = np.array([[128, 64, 32], [16, 0, 8], [4, 2, 1]], dtype=np.uint64)
     # convert the binary array to a configuration number array of same size
     # by convolving with template
     arr = np.ascontiguousarray(arr, dtype=np.uint64)
-    result = convolve(arr, template, mode='constant', cval=0)
+    result = convolve(arr, template, mode="constant", cval=0)
     # set the values in convolution result to zero which were zero in 'arr'
     result[arr == 0] = 0
     dict_of_indices_and_adjacent_coordinates = {}
@@ -109,8 +126,11 @@ def _set_adjacency_list(arr):
         dict_of_indices_and_adjacent_coordinates[non_zeros[0]] = []
     else:
         for item in non_zeros:
-            adjacent_coordinate_list = [tuple(np.array(item) + np.array(increments))
-                                        for increments in _get_increments(result[item], dimensions) if increments != ()]
+            adjacent_coordinate_list = [
+                tuple(np.array(item) + np.array(increments))
+                for increments in _get_increments(result[item], dimensions)
+                if increments != ()
+            ]
             dict_of_indices_and_adjacent_coordinates[item] = adjacent_coordinate_list
     return dict_of_indices_and_adjacent_coordinates
 
@@ -135,17 +155,23 @@ def _remove_clique_edges(networkx_graph):
     lengths that form the 3 vertex clique.
     Doesn't deal with any other cliques
     """
-    #start = time.time()
+    # start = time.time()
     cliques = nx.find_cliques_recursive(networkx_graph)
     # all the nodes/vertices of 3 cliques
     three_vertex_cliques = [clq for clq in cliques if len(clq) == 3]
     if len(list(three_vertex_cliques)) != 0:
-        combination_edges = [list(itertools.combinations(clique, 2)) for clique in three_vertex_cliques]
+        combination_edges = [
+            list(itertools.combinations(clique, 2)) for clique in three_vertex_cliques
+        ]
         subgraph_edge_lengths = []
         # different combination of edges in the cliques and their lengths
         for combinationEdge in combination_edges:
-            subgraph_edge_lengths.append([np.sum((np.array(item[0]) - np.array(item[1])) ** 2)
-                                          for item in combinationEdge])
+            subgraph_edge_lengths.append(
+                [
+                    np.sum((np.array(item[0]) - np.array(item[1])) ** 2)
+                    for item in combinationEdge
+                ]
+            )
         clique_edges = []
         # clique edges to be removed are collected here
         # the edges with maximum edge length
@@ -167,7 +193,7 @@ def _remove_clique_edges(networkx_graph):
                         clique_edges.append(combination_edges[main_dim][sub_dim])
                         break
         networkx_graph.remove_edges_from(clique_edges)
-        #print("time taken to remove cliques is %0.2f seconds" % (time.time() - start))
+        # print("time taken to remove cliques is %0.2f seconds" % (time.time() - start))
     return networkx_graph
 
 
@@ -185,9 +211,9 @@ def get_networkx_graph_from_array(binary_arr):
         graphical representation of the input array after clique removal
     """
     assert np.max(binary_arr) in [0, 1], "input must always be a binary array"
-    #start = time.time()
+    # start = time.time()
     dict_of_indices_and_adjacent_coordinates = _set_adjacency_list(binary_arr)
     networkx_graph = nx.from_dict_of_lists(dict_of_indices_and_adjacent_coordinates)
     _remove_clique_edges(networkx_graph)
-    #print("time taken to obtain networkxgraph is %0.3f seconds" % (time.time() - start))
+    # print("time taken to obtain networkxgraph is %0.3f seconds" % (time.time() - start))
     return networkx_graph

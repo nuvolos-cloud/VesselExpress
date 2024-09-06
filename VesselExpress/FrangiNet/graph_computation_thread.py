@@ -29,7 +29,7 @@ class GraphComputationThread(object):
 
     def start(self):
         if self.thread is not None:
-            raise Exception('join() needs to be called before restarting thread')
+            raise Exception("join() needs to be called before restarting thread")
         self.thread = threading.Thread(target=self)
         self.thread.start()
 

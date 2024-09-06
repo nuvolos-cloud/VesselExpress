@@ -15,13 +15,20 @@ import sys
 import os
 
 # import modules
-package = os.path.abspath(os.path.join(os.path.dirname(__file__), '../', 'dependencies/'))
+package = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "../", "dependencies/")
+)
 sys.path.append(package)
 
 import triangulation_table as tri_table
 
 
-def apply_factor(coordinates: object, factor_x: float = 1.0, factor_y: float = 1.0, factor_z: float = 1.0) -> list:
+def apply_factor(
+    coordinates: object,
+    factor_x: float = 1.0,
+    factor_y: float = 1.0,
+    factor_z: float = 1.0,
+) -> list:
     """
     Function to add independent factors to the x, y and z coordinates.
 
@@ -31,11 +38,21 @@ def apply_factor(coordinates: object, factor_x: float = 1.0, factor_y: float = 1
     :param factor_z: z-coordinate
     :return: list of coordinates
     """
-    return [coordinates[0] * factor_x, coordinates[1] * factor_y, coordinates[2] * factor_z]
+    return [
+        coordinates[0] * factor_x,
+        coordinates[1] * factor_y,
+        coordinates[2] * factor_z,
+    ]
 
 
-def get_triangle_stl_data(edge_indices, cube_position, cube_size, factor_x: float = 1.0,
-                          factor_y: float = 1.0, factor_z: float = 1.0):
+def get_triangle_stl_data(
+    edge_indices,
+    cube_position,
+    cube_size,
+    factor_x: float = 1.0,
+    factor_y: float = 1.0,
+    factor_z: float = 1.0,
+):
     """
     Function to create triangle-vertices and the face (connection of vertices) from
     three edge_indices (from triangulation-table), the root position of the cube,
@@ -51,10 +68,26 @@ def get_triangle_stl_data(edge_indices, cube_position, cube_size, factor_x: floa
     """
     f_x, f_y, f_z = factor_x, factor_y, factor_z
 
-    triangle_coordinates \
-        = [apply_factor(get_triangle_coordinate(edge_indices[0], cube_position, cube_size), f_x, f_y, f_z),
-           apply_factor(get_triangle_coordinate(edge_indices[1], cube_position, cube_size), f_x, f_y, f_z),
-           apply_factor(get_triangle_coordinate(edge_indices[2], cube_position, cube_size), f_x, f_y, f_z)]
+    triangle_coordinates = [
+        apply_factor(
+            get_triangle_coordinate(edge_indices[0], cube_position, cube_size),
+            f_x,
+            f_y,
+            f_z,
+        ),
+        apply_factor(
+            get_triangle_coordinate(edge_indices[1], cube_position, cube_size),
+            f_x,
+            f_y,
+            f_z,
+        ),
+        apply_factor(
+            get_triangle_coordinate(edge_indices[2], cube_position, cube_size),
+            f_x,
+            f_y,
+            f_z,
+        ),
+    ]
     return triangle_coordinates
 
 
@@ -66,14 +99,16 @@ def save_stl(stl_vertices, stl_faces, path, debug=False):
     :param stl_faces: list of faces in connection with stl_vertices
     :param path: path to save the file to
     """
-    if debug: print('Saving...')
+    if debug:
+        print("Saving...")
     stl_faces = stl_faces.astype(int)
     cube = mesh.Mesh(np.zeros(stl_faces.shape[0], dtype=mesh.Mesh.dtype))
     for i, f in enumerate(stl_faces):
         for j in range(3):
             cube.vectors[i][j] = stl_vertices[f[j], :]
     cube.save(path)
-    if debug: print('Finished!')
+    if debug:
+        print("Finished!")
 
 
 def get_triangle_coordinate(edge_index, cube_position, cube_size):
@@ -149,7 +184,7 @@ def get_triangles_definition(index):
     n = tri_vert[0]
     triangles = np.empty((0, 3))
     while i < 13 and n >= 0:
-        triangles = np.append(triangles, [tri_vert[i:i + 3]], axis=0)
+        triangles = np.append(triangles, [tri_vert[i : i + 3]], axis=0)
         i += 3
         n = tri_vert[i]
     return triangles
@@ -166,20 +201,36 @@ def tri_index(cube_vertices, isolevel=1):
     """
 
     cubeindex = 0
-    if cube_vertices[0] >= isolevel: cubeindex += 1
-    if cube_vertices[1] >= isolevel: cubeindex += 2
-    if cube_vertices[2] >= isolevel: cubeindex += 4
-    if cube_vertices[3] >= isolevel: cubeindex += 8
-    if cube_vertices[4] >= isolevel: cubeindex += 16
-    if cube_vertices[5] >= isolevel: cubeindex += 32
-    if cube_vertices[6] >= isolevel: cubeindex += 64
-    if cube_vertices[7] >= isolevel: cubeindex += 128
+    if cube_vertices[0] >= isolevel:
+        cubeindex += 1
+    if cube_vertices[1] >= isolevel:
+        cubeindex += 2
+    if cube_vertices[2] >= isolevel:
+        cubeindex += 4
+    if cube_vertices[3] >= isolevel:
+        cubeindex += 8
+    if cube_vertices[4] >= isolevel:
+        cubeindex += 16
+    if cube_vertices[5] >= isolevel:
+        cubeindex += 32
+    if cube_vertices[6] >= isolevel:
+        cubeindex += 64
+    if cube_vertices[7] >= isolevel:
+        cubeindex += 128
 
     return cubeindex
 
 
-def march_cube(cube_size, array, stl_path, isolevel: float = 1.0, factor_x: float = 1.0, factor_y: float = 1.0,
-               factor_z: float = 1.0, debug=False):
+def march_cube(
+    cube_size,
+    array,
+    stl_path,
+    isolevel: float = 1.0,
+    factor_x: float = 1.0,
+    factor_y: float = 1.0,
+    factor_z: float = 1.0,
+    debug=False,
+):
     """
     Function to apply marching cubes to a 3d numpy array.
 
@@ -194,13 +245,16 @@ def march_cube(cube_size, array, stl_path, isolevel: float = 1.0, factor_x: floa
     :return: stl_vertices and stl_faces
     """
     shape = array.shape
-    cubes = np.array(np.meshgrid(np.arange(start=0, stop=shape[2] - cube_size - 1, step=cube_size),
-                                 np.arange(start=0, stop=shape[1] - cube_size - 1, step=cube_size),
-                                 np.arange(start=0, stop=shape[0] - cube_size - 1, step=cube_size))).T.reshape(-1,
-                                                                                                               3)
+    cubes = np.array(
+        np.meshgrid(
+            np.arange(start=0, stop=shape[2] - cube_size - 1, step=cube_size),
+            np.arange(start=0, stop=shape[1] - cube_size - 1, step=cube_size),
+            np.arange(start=0, stop=shape[0] - cube_size - 1, step=cube_size),
+        )
+    ).T.reshape(-1, 3)
 
     if debug:
-        print('Marching Cubes progress:')
+        print("Marching Cubes progress:")
         bar_size = len(cubes)
         pbar = tqdm(total=bar_size)
 
@@ -211,25 +265,30 @@ def march_cube(cube_size, array, stl_path, isolevel: float = 1.0, factor_x: floa
         y = cubes[i][1]
         z = cubes[i][2]
 
-        vert_values = [array[z, y, x],
-                       array[z, y + cube_size, x],
-                       array[z, y + cube_size, x + cube_size],
-                       array[z, y, x + cube_size],
-                       array[z + cube_size, y, x],
-                       array[z + cube_size, y + cube_size, x],
-                       array[z + cube_size, y + cube_size, x + cube_size],
-                       array[z + cube_size, y, x + cube_size]]
+        vert_values = [
+            array[z, y, x],
+            array[z, y + cube_size, x],
+            array[z, y + cube_size, x + cube_size],
+            array[z, y, x + cube_size],
+            array[z + cube_size, y, x],
+            array[z + cube_size, y + cube_size, x],
+            array[z + cube_size, y + cube_size, x + cube_size],
+            array[z + cube_size, y, x + cube_size],
+        ]
 
         tri_table_index = tri_index(vert_values, isolevel)
         tri_vertices = get_triangles_definition(tri_table_index)
 
         for tri_vertex in tri_vertices:
-            vertices = get_triangle_stl_data(tri_vertex, [x, y, z], cube_size, factor_x, factor_y,
-                                             factor_z)
+            vertices = get_triangle_stl_data(
+                tri_vertex, [x, y, z], cube_size, factor_x, factor_y, factor_z
+            )
             stl_vertices.extend(vertices)
-        if debug: pbar.update(1)
+        if debug:
+            pbar.update(1)
 
-    if debug: pbar.close()
+    if debug:
+        pbar.close()
 
     stl_vertices = np.array(stl_vertices)
     stl_faces = np.arange(len(stl_vertices)).reshape(-1, 3)
@@ -238,8 +297,17 @@ def march_cube(cube_size, array, stl_path, isolevel: float = 1.0, factor_x: floa
     return stl_vertices, stl_faces
 
 
-def march_cube_multi(cube_size, array, stl_path, isolevel: float = 1.0, factor_x: float = 1.0, factor_y: float = 1.0,
-                     factor_z: float = 1.0, debug=False, workers: int = 2):
+def march_cube_multi(
+    cube_size,
+    array,
+    stl_path,
+    isolevel: float = 1.0,
+    factor_x: float = 1.0,
+    factor_y: float = 1.0,
+    factor_z: float = 1.0,
+    debug=False,
+    workers: int = 2,
+):
     """
     Function to apply marching cubes to a 3d numpy array.
 
@@ -255,14 +323,24 @@ def march_cube_multi(cube_size, array, stl_path, isolevel: float = 1.0, factor_x
     :return: stl_vertices and stl_faces
     """
     shape = array.shape
-    cubes = np.array(np.meshgrid(np.arange(start=0, stop=shape[2] - cube_size - 1, step=cube_size),
-                                 np.arange(start=0, stop=shape[1] - cube_size - 1, step=cube_size),
-                                 np.arange(start=0, stop=shape[0] - cube_size - 1, step=cube_size))).T.reshape(-1, 3)
-    if debug: print('Marching Cubes progress:')
+    cubes = np.array(
+        np.meshgrid(
+            np.arange(start=0, stop=shape[2] - cube_size - 1, step=cube_size),
+            np.arange(start=0, stop=shape[1] - cube_size - 1, step=cube_size),
+            np.arange(start=0, stop=shape[0] - cube_size - 1, step=cube_size),
+        )
+    ).T.reshape(-1, 3)
+    if debug:
+        print("Marching Cubes progress:")
 
     with Pool(workers) as p:
         stl_vertices = p.map(
-            functools.partial(get_vertices, data=[array, cube_size, factor_x, factor_y, factor_z, isolevel]), cubes)
+            functools.partial(
+                get_vertices,
+                data=[array, cube_size, factor_x, factor_y, factor_z, isolevel],
+            ),
+            cubes,
+        )
     stl_vertices = np.array([val for sublist in stl_vertices for val in sublist])
     stl_faces = np.arange(len(stl_vertices)).reshape(-1, 3)
 
@@ -284,19 +362,22 @@ def get_vertices(coordinate, data):
     array, cube_size, factor_x, factor_y, factor_z, isolevel = data
 
     stl_vertices = []
-    vert_values = [array[z, y, x],
-                   array[z, y + cube_size, x],
-                   array[z, y + cube_size, x + cube_size],
-                   array[z, y, x + cube_size],
-                   array[z + cube_size, y, x],
-                   array[z + cube_size, y + cube_size, x],
-                   array[z + cube_size, y + cube_size, x + cube_size],
-                   array[z + cube_size, y, x + cube_size]]
+    vert_values = [
+        array[z, y, x],
+        array[z, y + cube_size, x],
+        array[z, y + cube_size, x + cube_size],
+        array[z, y, x + cube_size],
+        array[z + cube_size, y, x],
+        array[z + cube_size, y + cube_size, x],
+        array[z + cube_size, y + cube_size, x + cube_size],
+        array[z + cube_size, y, x + cube_size],
+    ]
     tri_table_index = tri_index(vert_values, isolevel)
     tri_vertices = get_triangles_definition(tri_table_index)
     for tri_vertex in tri_vertices:
-        vertices = get_triangle_stl_data(tri_vertex, [x, y, z], cube_size, factor_x, factor_y,
-                                         factor_z)
+        vertices = get_triangle_stl_data(
+            tri_vertex, [x, y, z], cube_size, factor_x, factor_y, factor_z
+        )
         stl_vertices.extend(vertices)
     return stl_vertices
 
@@ -311,16 +392,31 @@ def array_dilation(array, debug, dilation_iterations):
     this should be equal to the cube size)
     :return: the dilated array
     """
-    if debug: print('Dilation of array...')
+    if debug:
+        print("Dilation of array...")
     array = ndimage.binary_dilation(array, iterations=dilation_iterations)
-    if debug: print('Array dilated!')
+    if debug:
+        print("Array dilated!")
     return array
 
 
-def tif_to_stl(image_path: str, cube_size: int, output_path: str, scaling_x: int, scaling_y: int, scaling_z: int, isolevel: float = 1.0, dilation: bool = False,
-               dilation_iterations: int = None,
-               debug=False, factor_x: float = 1, factor_y: float = 1, factor_z: float = 1, parallel: bool = False,
-               workers: int = 2):
+def tif_to_stl(
+    image_path: str,
+    cube_size: int,
+    output_path: str,
+    scaling_x: int,
+    scaling_y: int,
+    scaling_z: int,
+    isolevel: float = 1.0,
+    dilation: bool = False,
+    dilation_iterations: int = None,
+    debug=False,
+    factor_x: float = 1,
+    factor_y: float = 1,
+    factor_z: float = 1,
+    parallel: bool = False,
+    workers: int = 2,
+):
     """
     Function to generate an STL-File from an TIF-Image using an implementation of the marching cubes algorithm.
 
@@ -342,20 +438,41 @@ def tif_to_stl(image_path: str, cube_size: int, output_path: str, scaling_x: int
     :param stl_path: the path for the stl-file to safe
     :param debug: Boolean value to enable or disable debugging and progress information
     """
-    if debug: print('Creating array from TIF-Image...')
+    if debug:
+        print("Creating array from TIF-Image...")
     array = create_image_array(image_path)
-    if debug: print('Array created!')
+    if debug:
+        print("Array created!")
     if dilation:
-        if dilation_iterations is None: dilation_iterations = cube_size
+        if dilation_iterations is None:
+            dilation_iterations = cube_size
         array = array_dilation(array, debug, dilation_iterations)
 
-    if debug: print('Scaling array...')
-    array = array.repeat(scaling_x, axis=0).repeat(scaling_y, axis=1).repeat(scaling_z, axis=2)
-    if debug: print('Scaling complete!')
+    if debug:
+        print("Scaling array...")
+    array = (
+        array.repeat(scaling_x, axis=0)
+        .repeat(scaling_y, axis=1)
+        .repeat(scaling_z, axis=2)
+    )
+    if debug:
+        print("Scaling complete!")
     if parallel:
-        march_cube_multi(cube_size, array, output_path, isolevel, factor_x, factor_y, factor_z, debug, workers)
+        march_cube_multi(
+            cube_size,
+            array,
+            output_path,
+            isolevel,
+            factor_x,
+            factor_y,
+            factor_z,
+            debug,
+            workers,
+        )
     else:
-        march_cube(cube_size, array, output_path, isolevel, factor_x, factor_y, factor_z, debug)
+        march_cube(
+            cube_size, array, output_path, isolevel, factor_x, factor_y, factor_z, debug
+        )
 
 
 def parse_arguments():
@@ -364,111 +481,118 @@ def parse_arguments():
 
     :return: dictionary of argument values
     """
-    my_parser = argparse.ArgumentParser(description='Applies the Marching Cubes algorithm to a series of layered '
-                                                    'images.')
+    my_parser = argparse.ArgumentParser(
+        description="Applies the Marching Cubes algorithm to a series of layered "
+        "images."
+    )
 
-    my_parser.add_argument('-i',
-                           '--input',
-                           action='store',
-                           type=str,
-                           required=True,
-                           metavar='input_path')
-    my_parser.add_argument('-o',
-                           '--output',
-                           action='store',
-                           type=str,
-                           required=True,
-                           metavar='output_path')
-    my_parser.add_argument('-c',
-                           '--cube_size',
-                           action='store',
-                           type=int,
-                           required=True,
-                           metavar='size')
-    my_parser.add_argument('-l',
-                           '--isolevel',
-                           action='store',
-                           type=float,
-                           required=False,
-                           default=1.0,
-                           metavar='iso_level')
-    my_parser.add_argument('-d',
-                           '--dilation',
-                           action='store_true')
-    my_parser.add_argument('-j',
-                           '--dilation_iteration',
-                           action='store',
-                           type=int,
-                           required=False,
-                           default=None,
-                           metavar='iterations')
-    my_parser.add_argument('-X',
-                           '--scaling_x',
-                           action='store',
-                           type=float,
-                           required=False,
-                           default=1.0,
-                           metavar='workers')
-    my_parser.add_argument('-Y',
-                           '--scaling_y',
-                           action='store',
-                           type=float,
-                           required=False,
-                           default=1.0,
-                           metavar='workers')
-    my_parser.add_argument('-Z',
-                           '--scaling_z',
-                           action='store',
-                           type=float,
-                           required=False,
-                           default=1.0,
-                           metavar='workers')
-    my_parser.add_argument('-D',
-                           '--debug',
-                           action='store_true')
-    my_parser.add_argument('-x',
-                           '--factor_x',
-                           action='store',
-                           type=int,
-                           required=False,
-                           default=1,
-                           metavar='factor')
-    my_parser.add_argument('-y',
-                           '--factor_y',
-                           action='store',
-                           type=int,
-                           required=False,
-                           default=1,
-                           metavar='factor')
-    my_parser.add_argument('-z',
-                           '--factor_z',
-                           action='store',
-                           type=int,
-                           required=False,
-                           default=1,
-                           metavar='factor')
-    my_parser.add_argument('-P',
-                           '--parallel',
-                           action='store_true')
-    my_parser.add_argument('-w',
-                           '--workers',
-                           action='store',
-                           type=int,
-                           required=False,
-                           default=2,
-                           metavar='workers')
-    my_parser.add_argument('-p',
-                           '--pixel_dimensions',
-                           action='store',
-                           type=str,
-                           required=False,
-                           default="1.0,1.0,1.0",
-                           metavar='pixel dimensions')
+    my_parser.add_argument(
+        "-i", "--input", action="store", type=str, required=True, metavar="input_path"
+    )
+    my_parser.add_argument(
+        "-o", "--output", action="store", type=str, required=True, metavar="output_path"
+    )
+    my_parser.add_argument(
+        "-c", "--cube_size", action="store", type=int, required=True, metavar="size"
+    )
+    my_parser.add_argument(
+        "-l",
+        "--isolevel",
+        action="store",
+        type=float,
+        required=False,
+        default=1.0,
+        metavar="iso_level",
+    )
+    my_parser.add_argument("-d", "--dilation", action="store_true")
+    my_parser.add_argument(
+        "-j",
+        "--dilation_iteration",
+        action="store",
+        type=int,
+        required=False,
+        default=None,
+        metavar="iterations",
+    )
+    my_parser.add_argument(
+        "-X",
+        "--scaling_x",
+        action="store",
+        type=float,
+        required=False,
+        default=1.0,
+        metavar="workers",
+    )
+    my_parser.add_argument(
+        "-Y",
+        "--scaling_y",
+        action="store",
+        type=float,
+        required=False,
+        default=1.0,
+        metavar="workers",
+    )
+    my_parser.add_argument(
+        "-Z",
+        "--scaling_z",
+        action="store",
+        type=float,
+        required=False,
+        default=1.0,
+        metavar="workers",
+    )
+    my_parser.add_argument("-D", "--debug", action="store_true")
+    my_parser.add_argument(
+        "-x",
+        "--factor_x",
+        action="store",
+        type=int,
+        required=False,
+        default=1,
+        metavar="factor",
+    )
+    my_parser.add_argument(
+        "-y",
+        "--factor_y",
+        action="store",
+        type=int,
+        required=False,
+        default=1,
+        metavar="factor",
+    )
+    my_parser.add_argument(
+        "-z",
+        "--factor_z",
+        action="store",
+        type=int,
+        required=False,
+        default=1,
+        metavar="factor",
+    )
+    my_parser.add_argument("-P", "--parallel", action="store_true")
+    my_parser.add_argument(
+        "-w",
+        "--workers",
+        action="store",
+        type=int,
+        required=False,
+        default=2,
+        metavar="workers",
+    )
+    my_parser.add_argument(
+        "-p",
+        "--pixel_dimensions",
+        action="store",
+        type=str,
+        required=False,
+        default="1.0,1.0,1.0",
+        metavar="pixel dimensions",
+    )
 
     args = my_parser.parse_args()
-    filepath = os.path.dirname(vars(args)['input'])
-    if not Path(vars(args)['input']).is_file() or not Path(filepath).is_dir():
-        raise IOError('Inputfile or Output-Path does not exist!')
+    filepath = os.path.dirname(vars(args)["input"])
+    if not Path(vars(args)["input"]).is_file() or not Path(filepath).is_dir():
+        raise IOError("Inputfile or Output-Path does not exist!")
 
     return vars(args)
 
@@ -478,29 +602,29 @@ def main():
     Method to apply the Marching Cubes algorithm.
     """
     arguments = parse_arguments()
-    if arguments['debug']: start = time.time()
+    if arguments["debug"]:
+        start = time.time()
 
-    pixel_dims = [float(item) for item in arguments['pixel_dimensions'].split(',')]
+    pixel_dims = [float(item) for item in arguments["pixel_dimensions"].split(",")]
     tif_to_stl(
-        image_path=arguments['input'],
-        cube_size=arguments['cube_size'],
-        output_path=arguments['output'],
-        isolevel=arguments['isolevel'],
-        dilation=arguments['dilation'],
-        dilation_iterations=arguments['dilation_iteration'],
-        debug=arguments['debug'],
-        factor_x=arguments['factor_x'],
-        factor_y=arguments['factor_y'],
-        factor_z=arguments['factor_z'],
-        parallel=arguments['parallel'],
-        workers=arguments['workers'],
+        image_path=arguments["input"],
+        cube_size=arguments["cube_size"],
+        output_path=arguments["output"],
+        isolevel=arguments["isolevel"],
+        dilation=arguments["dilation"],
+        dilation_iterations=arguments["dilation_iteration"],
+        debug=arguments["debug"],
+        factor_x=arguments["factor_x"],
+        factor_y=arguments["factor_y"],
+        factor_z=arguments["factor_z"],
+        parallel=arguments["parallel"],
+        workers=arguments["workers"],
         scaling_x=pixel_dims[2],
         scaling_y=pixel_dims[1],
-        scaling_z=pixel_dims[0]
-
+        scaling_z=pixel_dims[0],
     )
 
-    if arguments['debug']:
+    if arguments["debug"]:
         end = time.time()
         print("The run took {:.4f} Seconds to complete!".format((end - start)))
 

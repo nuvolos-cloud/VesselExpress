@@ -17,18 +17,25 @@ def focal_loss(prediction_tensor, target_tensor, alpha=0.25, gamma=2):
     # For negative prediction, only need consider back part loss, front part is 0;
     # target_tensor > zeros <=> z=1, so negative coefficient = 0.
     neg_p_sub = array_ops.where(target_tensor > zeros, zeros, sigmoid_p)
-    
-    per_entry_cross_ent = - alpha * (pos_p_sub ** gamma) * tf.log(tf.clip_by_value(sigmoid_p, 1e-8, 1.0)) \
-                          - (1 - alpha) * (neg_p_sub ** gamma) * tf.log(tf.clip_by_value(1.0 - sigmoid_p, 1e-8, 1.0))
-    
+
+    per_entry_cross_ent = -alpha * (pos_p_sub**gamma) * tf.log(
+        tf.clip_by_value(sigmoid_p, 1e-8, 1.0)
+    ) - (1 - alpha) * (neg_p_sub**gamma) * tf.log(
+        tf.clip_by_value(1.0 - sigmoid_p, 1e-8, 1.0)
+    )
+
     return per_entry_cross_ent
 
 
 def get_loss(logits, labels, mask, weight):
-    with tf.variable_scope('losses'):
-        loss_wcr = tf.nn.weighted_cross_entropy_with_logits(logits=logits, targets=labels,
-                                                            pos_weight=10., name='weighted_cross_entropy')
-        loss_fc = focal_loss(logits, labels, alpha=0.9, gamma=2.)
+    with tf.variable_scope("losses"):
+        loss_wcr = tf.nn.weighted_cross_entropy_with_logits(
+            logits=logits,
+            targets=labels,
+            pos_weight=10.0,
+            name="weighted_cross_entropy",
+        )
+        loss_fc = focal_loss(logits, labels, alpha=0.9, gamma=2.0)
 
         loss_wcr = loss_wcr * weight
         loss_fc = loss_fc * weight
@@ -41,4 +48,3 @@ def get_loss(logits, labels, mask, weight):
         loss_fc = tf.reduce_mean(loss_fc)
 
         return loss_wcr, loss_fc
-

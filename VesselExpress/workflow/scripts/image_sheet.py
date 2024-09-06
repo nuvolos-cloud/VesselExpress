@@ -15,9 +15,17 @@ def img_is_color(img):
     return False
 
 
-def show_image_list(list_images, list_titles=None, list_cmaps=None, grid=True, num_cols=2, figsize=(20, 10),
-                    title_fontsize=30, result_dir=None):
-    '''
+def show_image_list(
+    list_images,
+    list_titles=None,
+    list_cmaps=None,
+    grid=True,
+    num_cols=2,
+    figsize=(20, 10),
+    title_fontsize=30,
+    result_dir=None,
+):
+    """
     Shows a grid of images, where each image is a Numpy array. The images can be either
     RGB or grayscale.
 
@@ -38,7 +46,7 @@ def show_image_list(list_images, list_titles=None, list_cmaps=None, grid=True, n
         Value to be passed to pyplot.figure()
     title_fontsize: int
         Value to be passed to set_title().
-    '''
+    """
 
     assert isinstance(list_images, list)
     assert len(list_images) > 0
@@ -46,11 +54,17 @@ def show_image_list(list_images, list_titles=None, list_cmaps=None, grid=True, n
 
     if list_titles is not None:
         assert isinstance(list_titles, list)
-        assert len(list_images) == len(list_titles), '%d imgs != %d titles' % (len(list_images), len(list_titles))
+        assert len(list_images) == len(list_titles), "%d imgs != %d titles" % (
+            len(list_images),
+            len(list_titles),
+        )
 
     if list_cmaps is not None:
         assert isinstance(list_cmaps, list)
-        assert len(list_images) == len(list_cmaps), '%d imgs != %d cmaps' % (len(list_images), len(list_cmaps))
+        assert len(list_images) == len(list_cmaps), "%d imgs != %d cmaps" % (
+            len(list_images),
+            len(list_cmaps),
+        )
 
     num_images = len(list_images)
     num_cols = min(num_images, num_cols)
@@ -67,31 +81,41 @@ def show_image_list(list_images, list_titles=None, list_cmaps=None, grid=True, n
 
     for i in range(num_images):
         img = list_images[i]
-        title = list_titles[i] if list_titles is not None else 'Image %d' % (i)
-        cmap = list_cmaps[i] if list_cmaps is not None else (None if img_is_color(img) else 'gray')
+        title = list_titles[i] if list_titles is not None else "Image %d" % (i)
+        cmap = (
+            list_cmaps[i]
+            if list_cmaps is not None
+            else (None if img_is_color(img) else "gray")
+        )
 
         list_axes[i].imshow(img, cmap=cmap)
         list_axes[i].set_title(title, fontsize=title_fontsize)
         list_axes[i].grid(grid)
-        list_axes[i].axis('off')
+        list_axes[i].axis("off")
 
     for i in range(num_images, len(list_axes)):
         list_axes[i].set_visible(False)
 
     fig.tight_layout()
-    #_ = plt.show()
+    # _ = plt.show()
 
     if result_dir != None:
-        plt.savefig(os.path.join(result_dir, 'image_sheet.png'))
+        plt.savefig(os.path.join(result_dir, "image_sheet.png"))
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Creates an image sheet of the segmentation results of VesselExpress')
-    parser.add_argument('-dir', type=str, help='output directroy of VesselExpress')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Creates an image sheet of the segmentation results of VesselExpress"
+    )
+    parser.add_argument("-dir", type=str, help="output directroy of VesselExpress")
     args = parser.parse_args()
 
     # All subdirectories in the current directory, not recursive.
-    img_dirs = [f for f in os.listdir(args.dir) if os.path.isdir(os.path.join(args.dir, f)) and not f.startswith('.')]
+    img_dirs = [
+        f
+        for f in os.listdir(args.dir)
+        if os.path.isdir(os.path.join(args.dir, f)) and not f.startswith(".")
+    ]
 
     fl_names = []
     imgs = []
@@ -100,8 +124,8 @@ if __name__ == '__main__':
     for i, img in enumerate(img_dirs):
         # read in raw and binary image
         img_dir = os.path.join(args.dir, img)
-        raw_img = tifffile.imread(os.path.join(img_dir, img + '.tiff'))
-        bin_img = tifffile.imread(os.path.join(img_dir, 'Binary_' + img + '.tiff'))
+        raw_img = tifffile.imread(os.path.join(img_dir, img + ".tiff"))
+        bin_img = tifffile.imread(os.path.join(img_dir, "Binary_" + img + ".tiff"))
 
         # adjust the contrast of the raw image
         image = raw_img
@@ -114,8 +138,15 @@ if __name__ == '__main__':
         # take middle slice and append to list
         slice = int(image.shape[0] / 2)
         fl_names.append(img)
-        fl_names.append('Binary_' + img)
+        fl_names.append("Binary_" + img)
         imgs.append(image[slice, :, :])
         imgs.append(bin_img[slice, :, :])
 
-    show_image_list(imgs, fl_names, num_cols=8, title_fontsize=8, figsize=(15, 10), result_dir=args.dir)
+    show_image_list(
+        imgs,
+        fl_names,
+        num_cols=8,
+        title_fontsize=8,
+        figsize=(15, 10),
+        result_dir=args.dir,
+    )
