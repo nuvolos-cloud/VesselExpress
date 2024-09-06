@@ -140,7 +140,7 @@ def download_images(all_results=None, flash_collection=None, firstrun=None):
 
 
 def download_logs(flash_collection=None, firstrun=None):
-    list_of_logfiles = glob(path.join(".snakemake/log", "*log"))  # List of log files #
+    list_of_logfiles = glob(path.join(".snakemake/log", r"*log"))  # List of log files #
     if len(list_of_logfiles) > 0:
         if firstrun:
             return 0
