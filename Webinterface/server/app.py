@@ -82,6 +82,7 @@ if "VESSELEXPRESS_SECRET" in os.environ:
 else:
     app.secret_key = b"2545d2d66e85c534f055ffa65bf58b91bc1f0770ff71143cbc33a4c06e62dc19"  # Do not expose this #
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["VESSELEXPRESS_BASE"] = VESSELEXPRESS_BASE
 
 
 ##### Sockets #####
