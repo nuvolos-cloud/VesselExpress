@@ -72,7 +72,7 @@ def clear_files(flash_collection):
         #    flash_collection.append({'message': f'{number_of_files} Files deleted', 'type': 'success'})
         # else:
         #    flash_collection.append({'message': f'{number_of_files} File deleted', 'type': 'success'})
-        flash_collection.append({"message": f"Files cleared", "type": "success"})
+        flash_collection.append({"message": "Files cleared", "type": "success"})
         return flash_collection
 
 
