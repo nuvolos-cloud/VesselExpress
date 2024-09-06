@@ -6,7 +6,7 @@
     {{ dropzone.style('border: 2px dashed #C80000; border-radius:5px; height: 225px; width: 100%;
                        overflow: auto; white-space: normal;') }}
     <!-- Customize options of the dropzone -->
-    {{ dropzone.config(max_files=512, timeout=0,
+    {{ dropzone.config(max_files=512, timeout=1800000,
     allowed_file_custom=true, allowed_file_type= "image/*, .tif, .tiff, .jpg, .jpeg, .png",
     default_message='<i class="huge cloud upload alternate icon"></i>
                      <header id="dragdropheader" style="margin-top:15px">
