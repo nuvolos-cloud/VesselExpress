@@ -186,7 +186,7 @@
     <script type=text/javascript>
         $SCRIPT_ROOT = {{ request.script_root | tojson | safe }};
         // Sockets
-        var log_socket = io.connect('http://127.0.0.1:5000/log', {transports: ['websocket']});  // Connect to socket
+        var log_socket = io.connect(window.location.origin + '/log', {transports: ['websocket']});  // Connect to socket
         var snakelogele = document.getElementById('snakelog');  // Textarea
         var blink = document.getElementById('prompt');  // Blinking marker
         var last_log = '';  // To detect changes in the log
@@ -212,7 +212,7 @@
         }, 550);
 
 
-        var render_socket = io.connect('http://localhost:5000/renderfiles', {transports: ['websocket']});
+        var render_socket = io.connect(window.location.origin + '/renderfiles', {transports: ['websocket']});
         var renderfilesele = document.getElementById('renderfiles');
         var last_renderfiles;
         render_socket.emit('get_files');
@@ -253,7 +253,7 @@
                             contentType: "application/json",
                             dataType: 'json'
                         })
-                        window.open('http://localhost:5000/render', '_blank');  // Opening new tab
+                        window.open(window.location.origin + '/render', '_blank');  // Opening new tab
                     })
                     renderfilesele.appendChild(elem);  // Appending button
                 }
@@ -261,7 +261,7 @@
             }
         });
 
-        var prog_socket = io.connect('http://127.0.0.1:5000/progbar', {transports: ['websocket']});
+        var prog_socket = io.connect(window.location.origin + '/progbar', {transports: ['websocket']});
         // Function when receiving 'newlog'
         var default_dl_button = document.getElementById("download_img_form").style.display
         prog_socket.on('newprogress', function (msg) {
