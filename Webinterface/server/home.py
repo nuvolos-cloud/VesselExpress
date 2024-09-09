@@ -31,9 +31,7 @@ def download_file(name):
     :param name: str, filename
     :return: download process
     """
-    return send_from_directory(
-        path.join(current_app.config["UPLOAD_FOLDER"]), secure_filename(name)
-    )
+    return send_from_directory(secure_filename(name))
 
 
 @favicon.route("/favicon.ico")
