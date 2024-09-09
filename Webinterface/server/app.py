@@ -68,7 +68,7 @@ log = logging.getLogger("werkzeug")
 log.disabled = True
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 
 ##### Import and register views #####

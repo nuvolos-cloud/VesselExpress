@@ -65,7 +65,7 @@ def home_page():
         if "download_images" in request.form or "download_statistics" in request.form:
             download_url = url_for(
                 "download_file",
-                name=DOWNLOAD_RESULTS,
+                name=path.basename(DOWNLOAD_RESULTS),
                 _scheme="https",
                 _external=True,
             )
@@ -77,7 +77,10 @@ def home_page():
             filename = utils.download_logs()  # Create zip file #
             if filename:
                 download_url = url_for(
-                    "download_file", name=filename, _scheme="https", _external=True
+                    "download_file",
+                    name=path.basename(filename),
+                    _scheme="https",
+                    _external=True,
                 )
                 logging.info(
                     f"Download logs request received, redirecing to {download_url}"
