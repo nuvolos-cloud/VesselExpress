@@ -32,7 +32,7 @@ def download_file(name):
     :return: download process
     """
     return send_from_directory(
-        path.join("../..", current_app.config["UPLOAD_FOLDER"]), secure_filename(name)
+        path.join(current_app.config["UPLOAD_FOLDER"]), secure_filename(name)
     )
 
 
