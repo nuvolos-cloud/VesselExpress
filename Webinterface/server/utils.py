@@ -97,9 +97,7 @@ def download_images(all_results=None, flash_collection=None, firstrun=None):
             return flash_collection
     else:
         # Zip everything except files that end with .zip and the config_standard.json #
-        with ZipFile(
-            path.join(current_app.config["UPLOAD_FOLDER"], DOWNLOAD_RESULTS), "w"
-        ) as zip_filename:
+        with ZipFile(DOWNLOAD_RESULTS, "w") as zip_filename:
             # Iterating over upload_folder and all subdirs to write them into a zip file #
             for dir, _, files in walk(current_app.config["UPLOAD_FOLDER"]):
                 # manipulate the directory for the structure INSIDE the zip file so that the zip file  #
