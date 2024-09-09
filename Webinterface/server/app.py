@@ -1,5 +1,5 @@
 import os
-from logging import getLogger
+import logging
 from os import (
     environ,
 )
@@ -62,10 +62,14 @@ app = Flask(__name__, static_folder="../static", template_folder="../templates")
 # cors_allowed_origins ='*' to allow all urls #
 # async_ mode is for servers like gunicorn that allow threading #
 socketio = SocketIO(
-    app, cors_allowed_origins="*", async_mode=None, logger=False, engineio_logger=False
+    app, cors_allowed_origins="*", async_mode=None, logger=True, engineio_logger=True
 )
-log = getLogger("werkzeug")
+log = logging.getLogger("werkzeug")
 log.disabled = True
+
+logging.basicConfig(
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)
 
 ##### Import and register views #####
 from home import home, download, favicon, render

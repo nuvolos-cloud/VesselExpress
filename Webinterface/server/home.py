@@ -1,5 +1,5 @@
 from os import path
-
+import logging
 from flask import (
     Blueprint,
     current_app,
@@ -31,9 +31,11 @@ def download_file(name):
     :param name: str, filename
     :return: download process
     """
-    return send_from_directory(
-        current_app.config["UPLOAD_FOLDER"], path.basename(secure_filename(name))
+    logging.info(
+        f"Sending file {secure_filename(name)} from folder {current_app.config['UPLOAD_FOLDER']}"
     )
+    upload_folder = path.abspath(current_app.config["UPLOAD_FOLDER"])
+    return send_from_directory(upload_folder, path.basename(secure_filename(name)))
 
 
 @favicon.route("/favicon.ico")
@@ -61,22 +63,26 @@ def home_page():
     if request.method == "POST":
         ##### Downloads #####
         if "download_images" in request.form or "download_statistics" in request.form:
-            return redirect(
-                url_for(
-                    "download_file",
-                    name=DOWNLOAD_RESULTS,
-                    _scheme="https",
-                    _external=True,
-                )
-            )  # Send file to download API #
+            download_url = url_for(
+                "download_file",
+                name=DOWNLOAD_RESULTS,
+                _scheme="https",
+                _external=True,
+            )
+            logging.info(
+                f"Download images request received, redirecing to {download_url}"
+            )
+            return redirect(download_url)  # Send file to download API #
         elif "download_logs" in request.form:
             filename = utils.download_logs()  # Create zip file #
             if filename:
-                return redirect(
-                    url_for(
-                        "download_file", name=filename, _scheme="https", _external=True
-                    )
-                )  # Send file to download API #
+                download_url = url_for(
+                    "download_file", name=filename, _scheme="https", _external=True
+                )
+                logging.info(
+                    f"Download logs request received, redirecing to {download_url}"
+                )
+                return redirect(download_url)  # Send file to download API #
 
         ##### Dropzone request #####
         if (
@@ -151,8 +157,12 @@ def render_serve_file(render_filename):  # Is called during render.html initiali
         if "Binary_" in render_filename
         else render_filename.replace("Skeleton_", "")
     )
+    upload_folder = path.abspath(current_app.config["UPLOAD_FOLDER"])
+    logging.info(
+        f"Serving file {secure_filename(render_filename + '.glb')} from folder {upload_folder}/{dir_folder}"
+    )
     # Expose the file to render.html to be opened in the model viewer #
     return send_from_directory(
-        path.join("../..", current_app.config["UPLOAD_FOLDER"], dir_folder),
+        path.join(upload_folder, dir_folder),
         secure_filename(render_filename + ".glb"),
     )
