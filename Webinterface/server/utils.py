@@ -211,9 +211,9 @@ def get_rendered_files():
     """
     rendered_files = []
     for dir, _, files in walk(
-        current_app.config["UPLOAD_FOLDER"]
+        path.abspath(current_app.config["UPLOAD_FOLDER"])
     ):  # Iterates output folder for .glb files #
-        if "VesselExpress/data\\" in dir or "VesselExpress/data/" in dir:
+        if "VesselExpress/data" in dir:
             # saves the name of the glb file in a list without _ and .glb #
             [
                 rendered_files.append(

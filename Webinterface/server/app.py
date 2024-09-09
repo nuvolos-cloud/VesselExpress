@@ -108,6 +108,7 @@ def communicate_log():  # Communicates with Websocket '/log' when receiving 'get
 @socketio.on("get_files", namespace="/renderfiles")
 def communicate_render():  # Communicates with Websocket '/renderfiles' when receiving 'get_files' trigger #
     rendered_files = utils.get_rendered_files()
+    logging.info(f"Rendered new files: {rendered_files}")
     if len(rendered_files) > 0:  # glb files present? -> send the names to the socket #
         emit("newfiles", {"data": rendered_files})
     else:

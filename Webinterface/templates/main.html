@@ -219,6 +219,7 @@
         setInterval(function () {
             if (render_socket.connected == true) {
                 render_socket.emit('get_files');
+                console.log('Getting rendered files')
             }
         }, 3000)
         render_socket.on('nonewfiles', function (msg) {  // Function when no glb files are present
