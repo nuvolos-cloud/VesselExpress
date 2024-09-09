@@ -62,13 +62,20 @@ def home_page():
         ##### Downloads #####
         if "download_images" in request.form or "download_statistics" in request.form:
             return redirect(
-                url_for("download_file", name=DOWNLOAD_RESULTS)
+                url_for(
+                    "download_file",
+                    name=DOWNLOAD_RESULTS,
+                    _scheme="https",
+                    _external=True,
+                )
             )  # Send file to download API #
         elif "download_logs" in request.form:
             filename = utils.download_logs()  # Create zip file #
             if filename:
                 return redirect(
-                    url_for("download_file", name=filename)
+                    url_for(
+                        "download_file", name=filename, _scheme="https", _external=True
+                    )
                 )  # Send file to download API #
 
         ##### Dropzone request #####
@@ -80,7 +87,7 @@ def home_page():
             )  # Send files to be uploaded to UPLOAD_FOLDER #
 
         ##### AJAX form requests #####
-        if request.get_json() != None:
+        if request.get_json() is not None:
             flash_collection = []
             instruction = request.get_json()[0]
             if "request" in instruction:

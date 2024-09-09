@@ -9,9 +9,15 @@ from flask_dropzone import Dropzone
 from flask_socketio import SocketIO, emit
 
 ##### Define global variables #####
+VESSELEXPRESS_BASE = os.getenv("VESSELEXPRESS_BASE", "VesselExpress")  # Base folder #
+UPLOAD_FOLDER = os.getenv(
+    "VESSELEXPRESS_DATA", "VesselExpress/data"
+)  # Pipeline output folder #
 ALLOWED_EXTENSIONS = {"tiff", "tif"}  # For uploaded images #
 DOWNLOAD_LOGS = "VesselExpress_logs.zip"  # Filename of the logs #
-DOWNLOAD_RESULTS = "VesselExpress_results.zip"  # Filename of the zipped results #
+DOWNLOAD_RESULTS = os.path.join(
+    UPLOAD_FOLDER, "VesselExpress_results.zip"
+)  # Filename of the zipped results #
 INTSET = {
     "render",
     "small_RAM_mode",
@@ -45,10 +51,7 @@ SKIP_CATEGORIES = {
     "segmentation2D",
     "franginet",
 }  # Skip these during config update #
-UPLOAD_FOLDER = os.getenv(
-    "VESSELEXPRESS_DATA", "VesselExpress/data"
-)  # Pipeline output folder #
-VESSELEXPRESS_BASE = os.getenv("VESSELEXPRESS_BASE", "VesselExpress")  # Base folder #
+
 
 ##### Define app #####
 environ["WERKZEUG_RUN_MAIN"] = ""

@@ -668,6 +668,27 @@
         }
     }
 
+    // Preview checkbox enable/disable parameters
+    function updatepreview(id) {
+        if (id.checked) {
+            document.getElementById("image_resolution_x").disabled = false;
+            document.getElementById("image_resolution_x_span").style.color = 'black';
+            document.getElementById("image_resolution_y").disabled = false;
+            document.getElementById("image_resolution_y_span").style.color = 'black';
+            document.getElementById("gpu_checkbox").disabled = false;
+            document.getElementById("gpu_span").style.color = 'black';
+            document.getElementById("preview").style.color = 'black';
+        } else {
+            document.getElementById("image_resolution_x").disabled = true;
+            document.getElementById("image_resolution_x_span").style.color = '#ababab';
+            document.getElementById("image_resolution_y").disabled = true;
+            document.getElementById("image_resolution_y_span").style.color = '#ababab';
+            document.getElementById("gpu_checkbox").disabled = true;
+            document.getElementById("gpu_span").style.color = '#ababab';
+            document.getElementById("preview").style.color = '#ababab';
+        }
+    }
+
     function getParams() {
         return {
             // General
