@@ -62,13 +62,13 @@ app = Flask(__name__, static_folder="../static", template_folder="../templates")
 # cors_allowed_origins ='*' to allow all urls #
 # async_ mode is for servers like gunicorn that allow threading #
 socketio = SocketIO(
-    app, cors_allowed_origins="*", async_mode=None, logger=True, engineio_logger=True
+    app, cors_allowed_origins="*", async_mode=None, logger=False, engineio_logger=False
 )
 log = logging.getLogger("werkzeug")
 log.disabled = True
 
 logging.basicConfig(
-    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO
+    format="%(asctime)s - %(levelname)s - %(message)s", level=logging.WARNING
 )
 
 ##### Import and register views #####

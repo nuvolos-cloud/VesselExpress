@@ -124,6 +124,9 @@ def home_page():
 
                 elif instruction["request"] == "get_render_preview":
                     # Pass name to global variable <- Essential to expose it to render.html #
+                    logging.info(
+                        f"Setting RENDER_FILE to {secure_filename(instruction['file_name'])}"
+                    )
                     global RENDER_FILE
                     RENDER_FILE = secure_filename(instruction["file_name"])
 
@@ -145,6 +148,7 @@ def home_page():
 ##### Render View #####
 @render.route("/render", methods=["GET", "POST"])
 def render_viewer():  # Is called when render.html is initialised in a tab #
+    logging.info(f"Rendering file {RENDER_FILE}")
     return render_template("render.html", file_name=RENDER_FILE)
 
 
